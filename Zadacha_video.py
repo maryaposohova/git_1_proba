@@ -38,6 +38,7 @@ class Video:
         self.time_now = time_now
         self.adult_mode = adult_mode
 
+
     def __str__(self):
         return f'{self.title}'
 
@@ -51,14 +52,9 @@ class UrTube:
     #     self.current_user = current_user
 
     def __init__(self, users=None, videos=None, current_user=None):
-        if not users:
-            self.users = []
-        self.users = users
-        if not videos:
-            self.videos = []
-        self.videos = videos
+        self.users = [] if users is None else users
+        self.videos = [] if videos is None else videos
         self.current_user = current_user
-
     # def __init__(self):
     #     users = None
     #     if not users:
@@ -73,9 +69,11 @@ class UrTube:
         return f'{self.videos}'
 
     def log_in(self, nickname, password):
+        hashed_password = hashlib.sha256(password.encode('utf-8')).hexdigest()
         for user in self.users:
-            if nickname == user.nickname and password == user.password:
-                var = self.current_user == user
+            if nickname == user.nickname and hashed_password == user.password:
+                return self.current_user == user, True
+        return False
 
     # def register(self, nickname, password, age):
     #     for user in self.users:
@@ -91,7 +89,7 @@ class UrTube:
             if nickname in user.nickname:
                 print(f'Пользователь {nickname} уже существует')
         else:
-            user = User(nickname, password, age)
+            user = User()
             self.users.append(user)
             self.log_out()
             self.log_in(user.nickname, user.password)
@@ -99,10 +97,15 @@ class UrTube:
     def log_out(self):
         return self.current_user is None
 
-    def add(self, *vid):  # доб видео в видеос
-        if vid not in self.videos:
-            for v in vid:
-                self.videos.append(v)
+    # def add(self, *vid):  # доб видео в видеос
+    #     if vid not in self.videos:
+    #         for v in vid:
+    #             self.videos.append(v)
+
+    def add(self, *args):  # добавление видео
+        if args not in self.videos:
+            for video_s in args:
+                self.videos.append(video_s)
 
     def get_videos(self, word_title):
         lst_word_title = []
@@ -119,6 +122,7 @@ class UrTube:
                 if video == video.title:
                     if video.adult_mode and self.current_user.age < 18:
                         print('Вам нет 18 лет, пожалуйста покиньте страницу')
+                        return
 
 
 ur = UrTube()
